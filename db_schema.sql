@@ -72,7 +72,6 @@ CREATE TABLE `contatos` (
 
 INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `celular`, `status`, `criado_em`, `alterado_em`) VALUES (NULL, 'Administrador', 'admin@admin.com', MD5('admin'), NULL, '1', current_timestamp(), NULL);
 
-
 CREATE TABLE `anuncios` (
   `id` int unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `nome` varchar(255) DEFAULT NULL,

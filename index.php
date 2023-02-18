@@ -1,149 +1,68 @@
 <?php
-	// Importa configurações.
-	require_once './config.php';
+    require_once 'config.php';
 
-	// Verifica módulo.
-	$modulo = filter_input(INPUT_GET, 'm', FILTER_DEFAULT);
-	if (empty($modulo)) $modulo = 'dashboard';
-
-	// Verifica sessão do usuário.
-	session_start();
-	if (!empty($_SESSION['user'])) {
-		$user = $_SESSION['user'];
-	} else {
-		if ($modulo != 'dashboard') {
-			$_SESSION['erro'] = 'Efetue login para continuar.'; // Define mensagem.
-
-			// Redireciona acesso.
-			header('Location: ./');
-			exit;
-		}
-	}
-
-	// Verifica logout.
-	if ($modulo == 'logout') {
-		$_SESSION['sucesso'] = 'Sessão encerrada.'; // Define mensagem.
-		unset($_SESSION['user'], $user); // Destroi a sessão.
-
-		// Redireciona acesso.
-		header('Location: ./');
-		exit;
-	}
+    // Pegar parâmetro da URL.
+    $m = filter_input(INPUT_GET, 'm', FILTER_DEFAULT);
+    //@$m = $_GET['m'];
+    if (empty($m)) {
+        $m = 'home';
+    } else {
+        if (!in_array($m, array('home', 'artigo'))) {
+            $m = '404';
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta author="<?= CMS_AUTOR; ?>">
-
-    <title><?= CMS_NOME; ?></title>
-	<link href="./cdn/imgs/favicon.png" type="image/png" rel="icon" />
-
-    <!-- CSS - Padrão template -->
-    <link href="./cdn/css/bootstrap.min.css" rel="stylesheet">
-    <link href="./cdn/css/font-awesome/css/font-awesome.css" rel="stylesheet">
-    <link href="./cdn/css/sb-admin.css" rel="stylesheet">
-
-	<!-- CSS - Customizações -->
-	<link href="./cdn/css/custom.css" rel="stylesheet">
+    <title><?= BLOG_NOME; ?></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <style>
+        body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+    </style>
 </head>
+<body class="w3-light-grey">
 
-<body>
-	<? if (!empty($user)) { ?>
-	    <div id="wrapper">
-	        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-	            <div class="navbar-header">
-	                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
-	                    <span class="sr-only">Navegação</span>
-	                    <span class="icon-bar"></span>
-	                    <span class="icon-bar"></span>
-	                    <span class="icon-bar"></span>
-	                </button>
-	                <a class="navbar-brand" href="javascript:void(0);" style="margin-left: 20px;">
-	                    <h3><?= CMS_NOME; ?></h3>
-	                </a>
-	            </div>
-	            <!-- /.navbar-header -->
+<!-- w3-content defines a container for fixed size centered content, 
+    and is wrapped around the whole page content, except for the footer in this example -->
+    <div class="w3-content" style="max-width:1400px">
 
-		        <?php
-		        	// Carrega menu navbar.
-		        	include './inc/navbar.php';
+        <!-- Header -->
+        <header class="w3-container w3-center w3-padding-32"> 
+            <h1><b><?= BLOG_NOME; ?></b></h1>
+            <p>Bem-vindo(a) ao blog do <span class="w3-tag"><?= BLOG_AUTOR; ?></span></p>
+        </header>
 
-		        	// Carrega menu sidebar.
-			    	include './inc/sidebar.php';
-			    ?>
-	        </nav>
+        <!-- Grid -->
+        <div class="w3-row">
 
-	        <div id="page-wrapper">
-				<?php
-					// Verifica existência do arquivo.
-					if (file_exists('./app/' . $modulo . '/_controller.php')) {
-						$file = './app/' . $modulo . '/_controller.php';
-					} else {
-						if ($modulo != 'dashboard') {
-							// Define mensagem de erro.
-							$_SESSION['erro'] = 'Você não possui autorização para acessar o módulo ou registro especificado.';
-							$modulo = 'dashboard';
-						}
-						$file = './inc/dashboard.php';
-					}
+            <!-- Blog entries -->
+            <div class="w3-col l8 s12">
+            <?php
+                include "{$m}.php";
+            ?>
+            </div>
 
-					// Carrega arquivo definido.
-					include $file;
-				?>
-	        </div>
-	        <!-- /#page-wrapper -->
-	    </div>
-	    <!-- /#wrapper -->
-	<? } else { ?>
-		<? include './inc/login.php'; ?>
-	<? } ?>
+            <!-- Introduction menu -->
+            <div class="w3-col l4">
+            <?php
+                include 'sidebar.php';
+            ?>
+            </div>
 
-	<div class='modal fade' id='suporte' tabindex="-1" role="dialog" aria-labelledby="suporte" aria-hidden="true">
-		<div class="modal-dialog">
-	        <div class="modal-content">
-	            <div class="modal-header">
-	                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-	                <h3>Suporte técnico</h3>
-	            </div>
-	            <div class="modal-body">
-	            	<p style="text-align:justify">
-	                    <strong>Desenvolvedor: </strong> <?= CMS_AUTOR; ?>
-	                </p>
-	                <p style="text-align:justify">
-	                    <strong>Via e-mail: </strong> <?= CMS_EMAIL; ?>
-	                </p>
-	                <p style="text-align:justify">
-	                    <strong>Via whatsapp: </strong> <?= CMS_WHATSAPP; ?>
-	                </p>
-	            </div>
-	            <div class="modal-footer">
-	                <a class="btn btn-default" href="javascript:void(0);" data-dismiss="modal"><span class="fa fa-times"></span> Fechar</a>
-	            </div>
-			</div>
-		</div>
-	</div>
+            <!-- END GRID -->
+        </div><br>
 
-    <!-- Scripts - Padrão template -->
-    <script src="./cdn/js/jquery.js"></script>
-    <script src="./cdn/js/bootstrap.min.js"></script>
-    <script src="./cdn/js/jquery.metisMenu.js"></script>
-    <script src="./cdn/js/sb-admin.js"></script>
+        <!-- END w3-content -->
+    </div>
 
-    <!-- Scripts - Padrão projeto -->
-    <script src="./cdn/js/validacoes.js"></script>
-	<script src="./cdn/js/jquery.maskedinput.js"></script>
-    <script src="./cdn/js/jquery.price_format.1.3.js"></script>
-    <script src="./cdn/js/custom.js"></script>
+    <!-- Footer -->
+    <footer class="w3-container w3-dark-grey w3-padding-32 w3-margin-top">
+        <p>&copy;<?= date('Y'); ?>. Desenvolvido por <a href="javascript:void(0);"><?= BLOG_AUTOR; ?></a>.</p>
+    </footer>
 
-	<?php
-		// Importa javascript do módulo.
-		if (file_exists('./app/' . $modulo . '/scripts.js')) {
-		?>
-			<script src="<?= './app/' . $modulo . '/scripts.js'; ?>"></script>
-		<?
-		}
-	?>
 </body>
 </html>
